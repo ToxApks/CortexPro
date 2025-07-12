@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cortex Digital | Portfolio of Sanskar</title>
+    
+    <!-- Tailwind & Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom Styles & Theming -->
+    <style>
+        :root {
+            --bg-color: #0A0A0A;
+            --text-color: #EAEAEA;
+            --primary-color: #3b82f6;
+            --glass-bg: rgba(20, 20, 20, 0.5);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        html.light {
+            --bg-color: #F5F5F5;
+            --text-color: #1a1a1a;
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        #hero-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .glass-card {
+            background-color: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            transition: background-color 0.5s ease, border-color 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section-title span {
+            display: inline-block;
+        }
+        
+        .skill-bar-inner {
+            transform-origin: left;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            border: 2px solid var(--bg-color);
+        }
+
+        .project-card:hover .project-image {
+            transform: scale(1.05);
+        }
+
+        /* Custom tooltip for futuristic feature */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 220px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -110px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+        
+        .tooltip .tooltip-text::after {
+          content: "";
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          margin-left: -5px;
+          border-width: 5px;
+          border-style: solid;
+          border-color: #1f2937 transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Developer Credit Hover */
+        #developer-credit:hover {
+            transform: translateY(-5px) !important; /* Override GSAP inline style */
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            color: var(--primary-color);
+        }
+        
+        /* Article Modal Styles */
+        #article-modal-backdrop {
+            transition: opacity 0.3s ease-in-out;
+        }
+        #article-modal-content {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        .article-body h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        .article-body p {
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            color: #d1d5db;
+        }
+        html.light .article-body p {
+            color: #4b5563;
+        }
+
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- 3D Background Canvas -->
+    <canvas id="hero-canvas"></canvas>
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center glass-card mt-4 rounded-full">
+            <a href="#" class="text-xl font-bold">Cortex<span class="text-blue-500">.</span></a>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#about" class="hover:text-blue-400 transition-colors">About</a>
+                <a href="#projects" class="hover:text-blue-400 transition-colors">Projects</a>
+                <a href="#contact" class="hover:text-blue-400 transition-colors">Contact</a>
+            </div>
+            <button id="theme-switcher" class="p-2 rounded-full hover:bg-gray-700/50 transition-colors">
+                <!-- Moon/Sun Icon will be injected by JS -->
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10">
+        <!-- Hero Section -->
+        <section id="hero" class="h-screen flex items-center justify-center text-center">
+            <div class="container mx-auto px-6">
+                <h1 class="text-4xl md:text-7xl font-extrabold leading-tight mb-4 hero-anim">
+                    Engineering <br> Tomorrow's Products
+                </h1>
+                <p class="text-lg md:text-xl max-w-3xl mx-auto text-gray-300 hero-anim">
+                    A tech innovator crafting intelligent, user-centric experiences with code and creativity.
+                </p>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-24 container mx-auto px-6">
+            <h2 class="section-title text-4xl font-bold mb-16 text-center">About Me</h2>
+            <div class="grid md:grid-cols-5 gap-12 items-start">
+                <div class="md:col-span-3">
+                    <h3 class="text-2xl font-semibold mb-6 text-blue-400">My Journey</h3>
+                    <div id="timeline" class="relative border-l-2 border-gray-700 space-y-12 pl-8">
+                        <!-- Timeline items will be injected by JS -->
+                    </div>
+                </div>
+                <div class="md:col-span-2">
+                    <h3 class="text-2xl font-semibold mb-6 text-blue-400">Skill Index</h3>
+                    <div id="skills" class="space-y-6">
+                        <!-- Skill bars will be injected by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="py-24">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title text-4xl font-bold mb-16 text-center">Case Studies</h2>
+                <div id="project-list" class="space-y-24">
+                    <!-- Project cards will be injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-24 container mx-auto px-6">
+            <h2 class="section-title text-4xl font-bold mb-12 text-center">Let's Connect</h2>
+            <div class="max-w-3xl mx-auto glass-card rounded-2xl p-8 md:p-12">
+                <form id="contact-form">
+                    <p class="text-center text-gray-400 mb-6">
+                        Fill out the form, or try the voice commands.
+                        <button type="button" id="voice-command-btn" class="ml-2 p-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300 inline-flex align-middle">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>
+                        </button>
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <input type="text" id="name" name="name" placeholder="Your Name" class="w-full bg-transparent border-b-2 border-gray-600 focus:border-blue-500 outline-none py-3 transition-colors" required>
+                        <input type="email" id="email" name="email" placeholder="Your Email" class="w-full bg-transparent border-b-2 border-gray-600 focus:border-blue-500 outline-none py-3 transition-colors" required>
+                    </div>
+                    <textarea id="message" name="message" placeholder="Your Message" rows="4" class="w-full bg-transparent border-b-2 border-gray-600 focus:border-blue-500 outline-none py-3 mb-6 transition-colors" required></textarea>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300 transform hover:scale-105">
+                        Send Message
+                    </button>
+                </form>
+                <p id="form-status" class="text-center mt-4"></p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center text-gray-500">
+        <div class="container mx-auto px-6">
+            <p>&copy; 2025 Cortex Digital. All rights reserved.</p>
+            <p class="text-sm mt-2">Crafted with futuristic tools and a human touch.</p>
+        </div>
+    </footer>
+    
+    <!-- UI Elements -->
+    <div class="tooltip fixed bottom-5 left-5 z-50">
+        <div id="cognitive-load-ui" class="flex items-center space-x-2 glass-card p-2 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M12 2v2"/><path d="M12 22v-2"/><path d="m17 7 1.5-1.5"/><path d="m5.5 18.5 1.5-1.5"/><path d="M22 12h-2"/><path d="M4 12H2"/><path d="m17 17-1.5 1.5"/><path d="m6.5 5.5-1.5 1.5"/></svg>
+            <span class="text-xs font-semibold">CALM</span>
+        </div>
+        <span class="tooltip-text"><b>Cognitive Load-Adaptive UI:</b> This site concept can intelligently reduce motion and simplify visuals if it detects user overload, ensuring a comfortable experience for everyone.</span>
+    </div>
+
+    <!-- Developer Credit -->
+    <div id="developer-credit" class="fixed bottom-5 right-5 z-50 text-xs text-gray-400 glass-card px-3 py-2 rounded-full" style="opacity: 0; transform: translateY(20px);">
+        Sanskar | RIT
+    </div>
+
+    <!-- Article Modal -->
+    <div id="article-modal" class="hidden fixed inset-0 z-50">
+        <div id="article-modal-backdrop" class="fixed inset-0 bg-black/70"></div>
+        <div class="relative w-full h-full flex items-center justify-center p-4">
+            <div id="article-modal-content" class="glass-card rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-8 md:p-12">
+                <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+                <h2 id="article-title" class="text-4xl font-bold mb-6"></h2>
+                <div id="article-body" class="prose prose-invert max-w-none"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    <script type="module">
+        // --- DATA ---
+        const timelineData = [
+            { year: '2023 - Present', title: 'Lead Product Engineer, InnovateX', description: 'Leading development of next-gen AI-powered analytics platforms.' },
+            { year: '2021 - 2023', title: 'Full-Stack Developer, TechCorp', description: 'Built and scaled responsive web applications for enterprise clients.' },
+            { year: '2020', title: 'B.Tech in Computer Science, RIT', description: 'Graduated with honors, focusing on human-computer interaction.' },
+        ];
+
+        const skillsData = [
+            { name: 'JavaScript & TypeScript', level: 95 },
+            { name: 'React & Next.js', level: 90 },
+            { name: 'Three.js & WebGL', level: 85 },
+            { name: 'Python (AI/ML)', level: 80 },
+            { name: 'UI/UX & Product Design', level: 92 },
+        ];
+
+        const projectsData = [
+            {
+                title: 'Project Sentient',
+                category: 'AI Analytics Dashboard',
+                description: 'A real-time data visualization tool that uses machine learning to predict market trends. Built with Next.js, D3.js, and a Python backend.',
+                image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&auto=format&fit=crop',
+                link: '#',
+                article: `
+                    <h3>The Challenge</h3>
+                    <p>Financial analysts are often overwhelmed by the sheer volume of real-time data. The challenge was to create a platform that not only displays this data but also provides actionable, predictive insights in an intuitive way. We needed to move beyond reactive dashboards to a proactive, intelligent system.</p>
+                    <h3>Our Approach</h3>
+                    <p>We adopted a human-centered design process, starting with in-depth interviews with target users. The core of Project Sentient is a custom machine learning model built with Python (using TensorFlow and scikit-learn) that analyzes historical data and live feeds to forecast trends. The front-end, built with Next.js for server-side rendering and performance, communicates with the Python backend via a REST API.</p>
+                    <p>For the visualizations, we chose D3.js for its power and flexibility, creating custom, interactive charts that allow users to drill down into the data. WebSockets were implemented to push live data to the client, ensuring the dashboard is always up-to-date without needing to refresh.</p>
+                    <h3>Outcome</h3>
+                    <p>Project Sentient reduced data analysis time for its pilot users by an average of 40%. The predictive accuracy of our model reached 88% within the first quarter of deployment. The project was lauded for its clean UI and the seamless integration of complex data streams into a single, coherent narrative.</p>
+                `
+            },
+            {
+                title: 'Nova OS',
+                category: 'Web-Based Operating System',
+                description: 'An experimental, browser-based OS environment with a focus on fluid animations and a modular interface. Powered by Svelte and WebGL.',
+                image: 'https://images.unsplash.com/photo-1605379399642-870262d3d051?q=80&w=1200&auto=format&fit=crop',
+                link: '#',
+                article: `
+                    <h3>The Vision</h3>
+                    <p>Could a modern web browser serve as a complete operating system? That was the question behind Nova OS. The goal was to create a lightweight, accessible, and visually stunning OS experience that runs entirely in the browser, leveraging the power of modern web technologies.</p>
+                    <h3>Technical Deep Dive</h3>
+                    <p>We chose Svelte for its compile-time reactivity, which results in highly performant code with a small bundle size—critical for an OS-like application. The windowing system, drag-and-drop functionality, and application launcher were all built from scratch using vanilla JavaScript.</p>
+                    <p>The most innovative feature is the use of WebGL for the UI's background and transition effects. Using Three.js, we created a dynamic, 3D particle system that reacts to user interactions like opening windows or moving the mouse, giving the entire system an ambient, alive feeling. This pushed the boundaries of what's typically expected from a web application's UI.</p>
+                    <h3>Results & Learnings</h3>
+                    <p>Nova OS proved to be a successful experiment, demonstrating that complex, stateful applications with high-performance graphics are viable on the web. It received significant attention on platforms like GitHub and served as a powerful demonstration of Svelte and WebGL's capabilities. The project reinforced the idea that the browser is the most versatile application runtime in the world.</p>
+                `
+            },
+        ];
+
+        // --- THEME ---
+        const themeSwitcher = document.getElementById('theme-switcher');
+        const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
+        const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+        
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light');
+                themeSwitcher.innerHTML = sunIcon;
+            } else {
+                document.documentElement.classList.add('light');
+                document.documentElement.classList.remove('dark');
+                themeSwitcher.innerHTML = moonIcon;
+            }
+        };
+
+        themeSwitcher.addEventListener('click', () => {
+            const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        });
+        
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        } else {
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            applyTheme(prefersDark ? 'dark' : 'light');
+        }
+
+
+        // --- 3D HERO SCENE (THREE.JS) ---
+        let scene, camera, renderer, crystal, particles;
+
+        function initThree() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('hero-canvas'), alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            const geometry = new THREE.IcosahedronGeometry(1.5, 0);
+            const material = new THREE.MeshStandardMaterial({
+                color: 0x3b82f6,
+                roughness: 0.1,
+                metalness: 0.8,
+                flatShading: true,
+            });
+            crystal = new THREE.Mesh(geometry, material);
+            scene.add(crystal);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+            scene.add(ambientLight);
+            const pointLight = new THREE.PointLight(0xffffff, 1);
+            pointLight.position.set(5, 5, 5);
+            scene.add(pointLight);
+
+            const particlesGeometry = new THREE.BufferGeometry;
+            const particlesCnt = 5000;
+            const posArray = new Float32Array(particlesCnt * 3);
+            for(let i = 0; i < particlesCnt * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 10;
+            }
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const particlesMaterial = new THREE.PointsMaterial({ size: 0.005, color: 0xffffff });
+            particles = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particles);
+
+            window.addEventListener('resize', onWindowResize);
+            document.addEventListener('mousemove', onMouseMove);
+            animate();
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        let mouseX = 0, mouseY = 0;
+        function onMouseMove(event) {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            crystal.rotation.x += 0.001;
+            crystal.rotation.y += 0.001;
+            particles.rotation.y += 0.0001;
+            
+            camera.position.x += (mouseX * 0.1 - camera.position.x) * 0.05;
+            camera.position.y += (mouseY * 0.1 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        }
+        
+        // --- DYNAMIC CONTENT INJECTION ---
+        function populateContent() {
+            const timelineContainer = document.getElementById('timeline');
+            timelineData.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'timeline-item';
+                div.innerHTML = `
+                    <p class="text-sm text-gray-400">${item.year}</p>
+                    <h4 class="text-xl font-semibold mt-1">${item.title}</h4>
+                    <p class="mt-2 text-gray-300">${item.description}</p>
+                `;
+                timelineContainer.appendChild(div);
+            });
+
+            const skillsContainer = document.getElementById('skills');
+            skillsData.forEach(skill => {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <div class="flex justify-between mb-1">
+                        <span class="text-base font-medium">${skill.name}</span>
+                        <span class="text-sm font-medium">${skill.level}%</span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2.5">
+                        <div class="bg-blue-600 h-2.5 rounded-full skill-bar-inner" style="width: ${skill.level}%" data-level="${skill.level}"></div>
+                    </div>
+                `;
+                skillsContainer.appendChild(div);
+            });
+
+            const projectListContainer = document.getElementById('project-list');
+            projectsData.forEach((project, index) => {
+                const article = document.createElement('article');
+                article.className = 'project-card grid md:grid-cols-2 gap-8 items-center';
+                article.innerHTML = `
+                    <div class="project-details">
+                        <p class="text-blue-400 font-semibold">${project.category}</p>
+                        <h3 class="text-3xl font-bold my-3">${project.title}</h3>
+                        <p class="text-gray-300 mb-6">${project.description}</p>
+                        <button data-index="${index}" class="read-article-btn font-bold text-white bg-blue-600/50 hover:bg-blue-600/80 transition-colors py-2 px-4 rounded-lg">Read Article &rarr;</button>
+                    </div>
+                    <div class="block rounded-lg overflow-hidden glass-card">
+                        <img src="${project.image}" alt="Screenshot of ${project.title}" class="project-image w-full h-auto object-cover transition-transform duration-500 ease-in-out">
+                    </div>
+                `;
+                projectListContainer.appendChild(article);
+            });
+        }
+        
+        // --- ANIMATIONS (GSAP) ---
+        function setupAnimations() {
+            gsap.registerPlugin(ScrollTrigger);
+
+            gsap.from(".hero-anim", {
+                duration: 1,
+                y: 50,
+                opacity: 0,
+                stagger: 0.2,
+                ease: "power3.out",
+                delay: 0.5
+            });
+            
+            gsap.to("#developer-credit", {
+                duration: 1,
+                y: 0,
+                opacity: 1,
+                ease: "power3.out",
+                delay: 1.5
+            });
+
+            gsap.utils.toArray('.section-title').forEach(title => {
+                const chars = title.innerText.split('');
+                title.innerHTML = chars.map(char => `<span>${char === ' ' ? '&nbsp;' : char}</span>`).join('');
+                gsap.from(title.querySelectorAll('span'), {
+                    scrollTrigger: {
+                        trigger: title,
+                        start: 'top 80%',
+                        toggleActions: 'play none none none'
+                    },
+                    opacity: 0,
+                    y: 20,
+                    rotateX: -90,
+                    stagger: 0.02,
+                    duration: 0.8,
+                    ease: 'power3.out'
+                });
+            });
+
+            gsap.from('.timeline-item', {
+                scrollTrigger: {
+                    trigger: '#timeline',
+                    start: 'top 70%'
+                },
+                opacity: 0,
+                x: -50,
+                stagger: 0.3,
+                duration: 1,
+                ease: 'power3.out'
+            });
+
+            gsap.utils.toArray('.skill-bar-inner').forEach(bar => {
+                gsap.from(bar, {
+                    scaleX: 0,
+                    duration: 1.5,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: bar,
+                        start: 'top 85%'
+                    }
+                });
+            });
+
+            gsap.utils.toArray('.project-card').forEach((card, index) => {
+                if (index % 2 !== 0) {
+                    const details = card.querySelector('.project-details');
+                    const imageContainer = card.querySelector('.block');
+                    card.innerHTML = '';
+                    card.appendChild(imageContainer);
+                    card.appendChild(details);
+                }
+                gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: card,
+                        start: 'top 80%'
+                    },
+                    opacity: 0,
+                    y: 100,
+                    duration: 1,
+                    ease: 'power3.out'
+                });
+            });
+            
+            gsap.to(crystal.rotation, {
+                scrollTrigger: {
+                    trigger: "body",
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: 1
+                },
+                x: Math.PI,
+                y: Math.PI
+            });
+        }
+        
+        // --- VOICE COMMANDS ---
+        function initVoiceCommands() {
+            const btn = document.getElementById('voice-command-btn');
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const messageInput = document.getElementById('message');
+            const formStatus = document.getElementById('form-status');
+
+            window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!window.SpeechRecognition) {
+                btn.style.display = 'none';
+                return;
+            }
+            
+            const recognition = new SpeechRecognition();
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            let isListening = false;
+
+            recognition.addEventListener('result', e => {
+                const transcript = Array.from(e.results)
+                    .map(result => result[0])
+                    .map(result => result.transcript)
+                    .join('');
+
+                if (transcript.toLowerCase().includes('set name to')) {
+                    nameInput.value = transcript.split('set name to')[1].trim();
+                }
+                if (transcript.toLowerCase().includes('set email to')) {
+                    emailInput.value = transcript.split('set email to')[1].trim().replace(/\s/g, '');
+                }
+                if (transcript.toLowerCase().includes('set message to')) {
+                    messageInput.value = transcript.split('set message to')[1].trim();
+                }
+                if (transcript.toLowerCase().includes('send message')) {
+                    document.getElementById('contact-form').requestSubmit();
+                }
+            });
+
+            recognition.addEventListener('end', () => {
+                isListening = false;
+                btn.classList.remove('animate-pulse', 'bg-red-600');
+                btn.classList.add('bg-blue-600');
+                formStatus.textContent = "";
+            });
+
+            btn.addEventListener('click', () => {
+                if (isListening) {
+                    recognition.stop();
+                } else {
+                    try {
+                        recognition.start();
+                        isListening = true;
+                        btn.classList.add('animate-pulse', 'bg-red-600');
+                        btn.classList.remove('bg-blue-600');
+                        formStatus.textContent = "Listening... Try 'Set name to John'.";
+                    } catch(err) {
+                        formStatus.textContent = "Voice command error. Please try again.";
+                    }
+                }
+            });
+        }
+        
+        // --- FORM HANDLING ---
+        function initForm() {
+            const form = document.getElementById('contact-form');
+            const status = document.getElementById('form-status');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                status.textContent = "Sending...";
+                status.style.color = 'inherit';
+                setTimeout(() => {
+                    status.textContent = "Message sent! Thanks for connecting.";
+                    status.style.color = '#4ade80';
+                    form.reset();
+                }, 1500);
+            });
+        }
+        
+        // --- ARTICLE MODAL ---
+        function initArticleModal() {
+            const modal = document.getElementById('article-modal');
+            const backdrop = document.getElementById('article-modal-backdrop');
+            const content = document.getElementById('article-modal-content');
+            const closeBtn = document.getElementById('close-modal-btn');
+            const articleTitle = document.getElementById('article-title');
+            const articleBody = document.getElementById('article-body');
+
+            function openModal(project) {
+                articleTitle.textContent = project.title;
+                articleBody.innerHTML = project.article;
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+
+                gsap.to(backdrop, { opacity: 1, duration: 0.3 });
+                gsap.fromTo(content, { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' });
+            }
+
+            function closeModal() {
+                gsap.to(content, { opacity: 0, scale: 0.95, duration: 0.3, ease: 'power3.in', onComplete: () => {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }});
+                gsap.to(backdrop, { opacity: 0, duration: 0.3 });
+            }
+            
+            document.querySelectorAll('.read-article-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const projectIndex = btn.dataset.index;
+                    openModal(projectsData[projectIndex]);
+                });
+            });
+
+            closeBtn.addEventListener('click', closeModal);
+            backdrop.addEventListener('click', closeModal);
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                    closeModal();
+                }
+            });
+        }
+
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            populateContent();
+            initThree();
+            setupAnimations();
+            initVoiceCommands();
+            initForm();
+            initArticleModal();
+        });
+
+    </script>
+</body>
+</html>
